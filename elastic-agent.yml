@@ -1,0 +1,164 @@
+id: ad07a9b0-9099-11ed-8d5e-9fa824b8d327
+revision: 3
+outputs:
+  default:
+    type: elasticsearch
+    hosts:
+      - 'http://192.168.2.146:9200'
+    username: 'elastic'
+    password: 'changeme'
+output_permissions:
+  default:
+    _elastic_agent_monitoring:
+      indices:
+        - names:
+            - logs-elastic_agent.apm_server-default
+          privileges: &ref_0
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-elastic_agent.apm_server-default
+          privileges: *ref_0
+        - names:
+            - logs-elastic_agent.auditbeat-default
+          privileges: *ref_0
+        - names:
+            - metrics-elastic_agent.auditbeat-default
+          privileges: *ref_0
+        - names:
+            - logs-elastic_agent.cloudbeat-default
+          privileges: *ref_0
+        - names:
+            - metrics-elastic_agent.cloudbeat-default
+          privileges: *ref_0
+        - names:
+            - logs-elastic_agent-default
+          privileges: *ref_0
+        - names:
+            - metrics-elastic_agent.elastic_agent-default
+          privileges: *ref_0
+        - names:
+            - metrics-elastic_agent.endpoint_security-default
+          privileges: *ref_0
+        - names:
+            - logs-elastic_agent.endpoint_security-default
+          privileges: *ref_0
+        - names:
+            - logs-elastic_agent.filebeat-default
+          privileges: *ref_0
+        - names:
+            - metrics-elastic_agent.filebeat-default
+          privileges: *ref_0
+        - names:
+            - logs-elastic_agent.fleet_server-default
+          privileges: *ref_0
+        - names:
+            - metrics-elastic_agent.fleet_server-default
+          privileges: *ref_0
+        - names:
+            - logs-elastic_agent.heartbeat-default
+          privileges: *ref_0
+        - names:
+            - metrics-elastic_agent.heartbeat-default
+          privileges: *ref_0
+        - names:
+            - logs-elastic_agent.metricbeat-default
+          privileges: *ref_0
+        - names:
+            - metrics-elastic_agent.metricbeat-default
+          privileges: *ref_0
+        - names:
+            - logs-elastic_agent.osquerybeat-default
+          privileges: *ref_0
+        - names:
+            - metrics-elastic_agent.osquerybeat-default
+          privileges: *ref_0
+        - names:
+            - logs-elastic_agent.packetbeat-default
+          privileges: *ref_0
+        - names:
+            - metrics-elastic_agent.packetbeat-default
+          privileges: *ref_0
+    _elastic_agent_checks:
+      cluster:
+        - monitor
+    10f288ff-56cf-4680-a865-885ab0ed6c44:
+      indices:
+        - names:
+            - logs-apache.access-default
+          privileges: *ref_0
+        - names:
+            - logs-apache.error-default
+          privileges: *ref_0
+        - names:
+            - metrics-apache.status-default
+          privileges: *ref_0
+agent:
+  download:
+    source_uri: 'https://artifacts.elastic.co/downloads/'
+  monitoring:
+    enabled: true
+    use_output: default
+    namespace: default
+    logs: true
+    metrics: true
+inputs:
+  - id: logfile-apache-10f288ff-56cf-4680-a865-885ab0ed6c44
+    name: apache-1
+    revision: 1
+    type: logfile
+    use_output: default
+    meta:
+      package:
+        name: apache
+        version: 1.8.0
+    data_stream:
+      namespace: default
+    streams:
+      - id: logfile-apache.access-10f288ff-56cf-4680-a865-885ab0ed6c44
+        data_stream:
+          dataset: apache.access
+          type: logs
+        paths:
+          - /var/log/apache2/access.log*
+          - /var/log/apache2/other_vhosts_access.log*
+          - /var/log/httpd/access_log*
+        tags:
+          - apache-access
+        exclude_files:
+          - .gz$
+      - id: logfile-apache.error-10f288ff-56cf-4680-a865-885ab0ed6c44
+        data_stream:
+          dataset: apache.error
+          type: logs
+        paths:
+          - /var/log/apache2/error.log*
+          - /var/log/httpd/error_log*
+        exclude_files:
+          - .gz$
+        tags:
+          - apache-error
+        processors:
+          - add_locale: null
+  - id: apache/metrics-apache-10f288ff-56cf-4680-a865-885ab0ed6c44
+    name: apache-1
+    revision: 1
+    type: apache/metrics
+    use_output: default
+    meta:
+      package:
+        name: apache
+        version: 1.8.0
+    data_stream:
+      namespace: default
+    streams:
+      - id: apache/metrics-apache.status-10f288ff-56cf-4680-a865-885ab0ed6c44
+        data_stream:
+          dataset: apache.status
+          type: metrics
+        metricsets:
+          - status
+        hosts:
+          - 'http://127.0.0.1'
+        period: 30s
+        server_status_path: /server-status
